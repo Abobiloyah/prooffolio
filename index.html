@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Content Show Glass</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f8f9fa;
+      --surface: #ffffff;
+      --border: #e2e5e9;
+      --text: #1a1d21;
+      --text-secondary: #5f6672;
+      --text-tertiary: #8b919a;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --accent-light: #eff4ff;
+      --danger: #dc2626;
+      --danger-hover: #b91c1c;
+      --radius: 10px;
+      --radius-lg: 14px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif;
+      --max-w: 720px;
+      --transition: 0.15s ease;
+    }
+
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+    /* ── Layout ── */
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 20px; }
+
+    /* ── Header ── */
+    .site-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .site-header .container { display: flex; align-items: center; justify-content: space-between; }
+    .site-logo {
+      font-size: 1.05rem; font-weight: 700; color: var(--text);
+      text-decoration: none; letter-spacing: -0.02em;
+    }
+    .site-logo span { color: var(--accent); }
+    .header-actions { display: flex; gap: 8px; align-items: center; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: var(--radius); font-size: 0.875rem;
+      font-weight: 500; border: none; cursor: pointer;
+      text-decoration: none; transition: all var(--transition); line-height: 1.4;
+      font-family: var(--font);
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); box-shadow: var(--shadow-sm); }
+    .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--bg); border-color: #cdd1d6; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: var(--danger-hover); }
+    .btn-ghost { background: transparent; color: var(--text-secondary); padding: 6px 10px; }
+    .btn-ghost:hover { background: var(--bg); color: var(--text); }
+    .btn-sm { padding: 6px 12px; font-size: 0.8125rem; }
+    .btn-icon { padding: 6px; border-radius: 8px; }
+
+    /* ── Forms ── */
+    .form-group { margin-bottom: 20px; }
+    .form-label {
+      display: block; font-size: 0.8125rem; font-weight: 600;
+      color: var(--text); margin-bottom: 6px;
+    }
+    .form-hint { font-size: 0.75rem; color: var(--text-tertiary); margin-top: 4px; }
+    .form-input, .form-textarea, .form-select {
+      width: 100%; padding: 9px 12px; border: 1px solid var(--border);
+      border-radius: var(--radius); font-size: 0.9375rem; font-family: var(--font);
+      color: var(--text); background: var(--surface); transition: border-color var(--transition);
+      line-height: 1.5;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none; border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: var(--text-tertiary); }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 24px;
+      box-shadow: var(--shadow-sm); transition: box-shadow var(--transition);
+    }
+    .card:hover { box-shadow: var(--shadow); }
+
+    /* ── Views ── */
+    .view { display: none; padding: 32px 0 60px; }
+    .view.active { display: block; }
+
+    /* ════════════════════════════
+       HOME VIEW
+    ════════════════════════════ */
+    .home-hero { text-align: center; padding: 60px 0 40px; }
+    .home-hero h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 12px; }
+    .home-hero p { color: var(--text-secondary); font-size: 1.05rem; max-width: 440px; margin: 0 auto 28px; }
+    .home-search-wrap {
+      max-width: 400px; margin: 0 auto 12px; position: relative;
+    }
+    .home-search-wrap .form-input { padding-left: 38px; }
+    .home-search-wrap svg {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      width: 16px; height: 16px; color: var(--text-tertiary);
+    }
+    .home-profiles { margin-top: 36px; }
+    .home-profiles h2 { font-size: 0.8125rem; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
+    .profile-list { display: grid; gap: 12px; }
+    .profile-list-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); text-decoration: none; color: var(--text);
+      transition: all var(--transition);
+    }
+    .profile-list-item:hover { box-shadow: var(--shadow-md); border-color: #cdd1d6; transform: translateY(-1px); }
+    .profile-list-avatar {
+      width: 44px; height: 44px; border-radius: 50%; background: var(--accent-light);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: var(--accent); font-size: 1rem;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .profile-list-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-list-info { flex: 1; min-width: 0; }
+    .profile-list-name { font-weight: 600; font-size: 0.9375rem; }
+    .profile-list-bio {
+      font-size: 0.8125rem; color: var(--text-secondary);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .profile-list-arrow { color: var(--text-tertiary); flex-shrink: 0; }
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--text-secondary); }
+    .empty-state p { margin-bottom: 16px; }
+
+    /* ════════════════════════════
+       PUBLIC PROFILE VIEW
+    ════════════════════════════ */
+    .profile-header { text-align: center; padding-bottom: 32px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+    .profile-avatar {
+      width: 88px; height: 88px; border-radius: 50%; margin: 0 auto 16px;
+      background: var(--accent-light); display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 2rem; color: var(--accent); overflow: hidden;
+    }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-name { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+    .profile-username { font-size: 0.875rem; color: var(--text-tertiary); margin-top: 2px; }
+    .profile-bio { color: var(--text-secondary); margin-top: 8px; font-size: 0.9375rem; max-width: 480px; margin-left: auto; margin-right: auto; }
+
+    .content-section-title { font-size: 0.8125rem; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
+
+    .featured-card {
+      background: var(--surface); border: 2px solid var(--accent);
+      border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 32px;
+      box-shadow: 0 4px 16px rgba(37,99,235,0.08);
+      transition: all var(--transition);
+    }
+    .featured-card:hover { box-shadow: 0 6px 20px rgba(37,99,235,0.12); transform: translateY(-1px); }
+    .featured-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--accent); color: #fff; font-size: 0.6875rem;
+      font-weight: 700; padding: 3px 10px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .featured-card .card-body { padding: 20px 24px 24px; }
+    .featured-card .card-thumb {
+      width: 100%; height: 200px; object-fit: cover; display: block;
+    }
+
+    .content-grid { display: grid; gap: 14px; }
+    .content-card {
+      display: flex; gap: 16px; align-items: flex-start;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 18px 20px;
+      text-decoration: none; color: var(--text);
+      transition: all var(--transition);
+    }
+    .content-card:hover { box-shadow: var(--shadow-md); border-color: #cdd1d6; transform: translateY(-1px); }
+    .content-card-thumb {
+      width: 64px; height: 64px; border-radius: 8px; object-fit: cover; flex-shrink: 0;
+    }
+    .content-card-body { flex: 1; min-width: 0; }
+    .content-card-title { font-weight: 600; font-size: 0.9375rem; margin-bottom: 2px; }
+    .content-card-desc { font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 6px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .content-card-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .content-tag {
+      font-size: 0.6875rem; font-weight: 600; padding: 2px 8px;
+      background: var(--bg); border-radius: 20px; color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .content-card-link { font-size: 0.75rem; color: var(--accent); display: flex; align-items: center; gap: 3px; }
+
+    .profile-not-found { text-align: center; padding: 80px 20px; }
+    .profile-not-found h2 { font-size: 1.25rem; margin-bottom: 8px; }
+    .profile-not-found p { color: var(--text-secondary); margin-bottom: 20px; }
+
+    /* ════════════════════════════
+       EDIT PROFILE VIEW
+    ════════════════════════════ */
+    .edit-section { margin-bottom: 36px; }
+    .edit-section-title { font-size: 1.125rem; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.01em; }
+    .edit-section-subtitle { font-size: 0.8125rem; color: var(--text-secondary); margin-top: -14px; margin-bottom: 20px; }
+
+    .avatar-upload {
+      display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
+    }
+    .avatar-preview {
+      width: 64px; height: 64px; border-radius: 50%; background: var(--accent-light);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: var(--accent); font-size: 1.25rem; overflow: hidden; flex-shrink: 0;
+    }
+    .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── Content Entries List ── */
+    .entries-list { display: grid; gap: 12px; margin-top: 16px; }
+    .entry-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); transition: all var(--transition);
+    }
+    .entry-item.is-featured { border-color: var(--accent); background: var(--accent-light); }
+    .entry-item-body { flex: 1; min-width: 0; }
+    .entry-item-title { font-weight: 600; font-size: 0.875rem; }
+    .entry-item-link {
+      font-size: 0.75rem; color: var(--text-tertiary);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .entry-item-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+      display: none; align-items: center; justify-content: center;
+      z-index: 100; padding: 20px; backdrop-filter: blur(2px);
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: var(--surface); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg); width: 100%; max-width: 520px;
+      max-height: 90vh; overflow-y: auto; padding: 28px;
+    }
+    .modal-title { font-size: 1.125rem; font-weight: 700; margin-bottom: 20px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+    /* ── Confirm dialog ── */
+    .confirm-text { color: var(--text-secondary); font-size: 0.9375rem; margin-bottom: 4px; }
+
+    /* ── Toast ── */
+    .toast-container {
+      position: fixed; bottom: 24px; right: 24px; z-index: 200;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast {
+      padding: 12px 18px; background: var(--text); color: #fff;
+      border-radius: var(--radius); font-size: 0.875rem; font-weight: 500;
+      box-shadow: var(--shadow-lg); animation: toastIn 0.25s ease, toastOut 0.3s ease 2.5s forwards;
+    }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-8px); } }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .home-hero h1 { font-size: 1.5rem; }
+      .home-hero { padding: 40px 0 28px; }
+      .view { padding: 24px 0 48px; }
+      .profile-avatar { width: 72px; height: 72px; font-size: 1.5rem; }
+      .featured-card .card-thumb { height: 150px; }
+      .form-row { grid-template-columns: 1fr; }
+      .modal { padding: 20px; }
+      .entry-item { flex-wrap: wrap; }
+      .entry-item-actions { width: 100%; justify-content: flex-end; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Header ─── -->
+  <header class="site-header">
+    <div class="container">
+      <a href="#/" class="site-logo">Content<span>Show</span>Glass</a>
+      <div class="header-actions" id="headerActions"></div>
+    </div>
+  </header>
+
+  <!-- ─── App Root ─── -->
+  <main id="app">
+
+    <!-- HOME VIEW -->
+    <section id="viewHome" class="view">
+      <div class="container">
+        <div class="home-hero">
+          <h1>Proof of Work,<br/>Not Proof of Popularity</h1>
+          <p>A lightweight portfolio showcase. No likes. No followers. Just your work.</p>
+          <div class="home-search-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+            <input type="text" class="form-input" id="homeSearch" placeholder="Search profiles..." autocomplete="off" />
+          </div>
+        </div>
+        <div class="home-profiles" id="homeProfiles"></div>
+      </div>
+    </section>
+
+    <!-- PUBLIC PROFILE VIEW -->
+    <section id="viewProfile" class="view">
+      <div class="container" id="profileContent"></div>
+    </section>
+
+    <!-- EDIT PROFILE VIEW -->
+    <section id="viewEdit" class="view">
+      <div class="container" id="editContent"></div>
+    </section>
+
+  </main>
+
+  <!-- ─── Entry Modal ─── -->
+  <div class="modal-overlay" id="entryModal">
+    <div class="modal">
+      <div class="modal-title" id="entryModalTitle">Add Content</div>
+      <form id="entryForm">
+        <input type="hidden" id="entryEditId" />
+        <div class="form-group">
+          <label class="form-label" for="entryTitle">Title</label>
+          <input type="text" class="form-input" id="entryTitle" placeholder="e.g. My Blog Post" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="entryDesc">Short Description</label>
+          <textarea class="form-textarea" id="entryDesc" rows="2" placeholder="Brief description of this content..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="entryLink">External Link</label>
+          <input type="url" class="form-input" id="entryLink" placeholder="https://..." required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="entryThumb">Thumbnail URL <span style="font-weight:400;color:var(--text-tertiary)">(optional)</span></label>
+            <input type="url" class="form-input" id="entryThumb" placeholder="https://..." />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="entryTag">Tag / Category <span style="font-weight:400;color:var(--text-tertiary)">(optional)</span></label>
+            <input type="text" class="form-input" id="entryTag" placeholder="e.g. Article" />
+          </div>
+        </div>
+        <div class="form-group" style="display:flex;align-items:center;gap:8px;">
+          <input type="checkbox" id="entryFeatured" style="accent-color:var(--accent);width:16px;height:16px;" />
+          <label for="entryFeatured" style="font-size:0.875rem;font-weight:500;cursor:pointer;">Mark as Featured</label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="entryModalCancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="entryModalSave">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── Confirm Modal ─── -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal" style="max-width:380px;">
+      <div class="modal-title" id="confirmTitle">Confirm</div>
+      <p class="confirm-text" id="confirmText"></p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="confirmCancel">Cancel</button>
+        <button class="btn btn-danger" id="confirmOk">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Toast Container ─── -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
